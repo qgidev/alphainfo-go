@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	sdkVersion     = "1.5.11"
+	sdkVersion     = "1.5.12"
 	defaultBaseURL = "https://www.alphainfo.io"
 	defaultTimeout = 30 * time.Second
 	analyzeTimeout = 120 * time.Second
@@ -299,6 +299,14 @@ func fetchJSON(ctx context.Context, fullURL string) (map[string]interface{}, err
 // ---------------------------------------------------------------------------
 
 // Analyze runs a full structural analysis on a single signal.
+//
+// If Domain is empty, "generic" is used. Pass "auto" to have the server
+// infer the calibration from the signal — read AnalysisResult.DomainApplied
+// to see what it chose and AnalysisResult.DomainInference for the reasoning.
+// Specific domains ("biomedical", "finance", "seismic", …) apply their
+// calibration directly; aliases ("fintech"→"finance", "biomed"→"biomedical",
+// "grid"→"power_grid", …) resolve server-side; real typos receive an HTTP
+// 400 with a "Did you mean …?" suggestion.
 func (c *Client) Analyze(ctx context.Context, req AnalyzeRequest) (*AnalysisResult, error) {
 	if req.Domain == "" {
 		req.Domain = "generic"
@@ -312,6 +320,14 @@ func (c *Client) Analyze(ctx context.Context, req AnalyzeRequest) (*AnalysisResu
 		return nil, &Error{Message: "parse analysis: " + err.Error(), Kind: ErrAPI}
 	}
 	return &out, nil
+}
+
+// AnalyzeAuto is syntactic sugar for Analyze with Domain="auto". The server
+// picks the calibration from cheap signal statistics; inspect
+// AnalysisResult.DomainInference for confidence + reasoning.
+func (c *Client) AnalyzeAuto(ctx context.Context, req AnalyzeRequest) (*AnalysisResult, error) {
+	req.Domain = "auto"
+	return c.Analyze(ctx, req)
 }
 
 // Fingerprint extracts the 5D structural fingerprint (fast path).

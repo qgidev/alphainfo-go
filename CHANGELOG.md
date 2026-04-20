@@ -2,6 +2,22 @@
 
 All notable changes to alphainfo-go.
 
+## [1.5.12] - 2026-04-20
+
+Added automatic domain inference; `Domain` field now optional with
+sensible default.
+
+- New `DomainInference` struct exported from `alphainfo`.
+- `AnalysisResult.DomainApplied string` — populated by server 1.5.12+.
+- `AnalysisResult.DomainInference *DomainInference` — populated only
+  when the caller passed `Domain="auto"`.
+- New `client.AnalyzeAuto(ctx, req)` — sugar for `Analyze` with
+  `req.Domain = "auto"`.
+- Godoc on `Analyze` explains "auto", aliases, and the "Did you mean …?"
+  suggestion path.
+
+Backwards-compatible: existing callers unaffected.
+
 ## [1.5.11] - 2026-04-20
 
 ### Connection cleanup improvements.

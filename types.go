@@ -52,6 +52,15 @@ type SemanticResult struct {
 	Details           map[string]interface{} `json:"details,omitempty"`
 }
 
+// DomainInference is the inference block returned when the caller passed
+// Domain="auto". Nil for any other Domain value.
+type DomainInference struct {
+	Inferred     string  `json:"inferred"`
+	Confidence   float64 `json:"confidence"`
+	FallbackUsed bool    `json:"fallback_used"`
+	Reasoning    string  `json:"reasoning"`
+}
+
 // AnalysisResult is the full response from Analyze.
 type AnalysisResult struct {
 	StructuralScore float64                `json:"structural_score"`
@@ -64,6 +73,12 @@ type AnalysisResult struct {
 	Provenance      map[string]interface{} `json:"provenance,omitempty"`
 	Semantic        *SemanticResult        `json:"semantic,omitempty"`
 	Warning         *string                `json:"warning,omitempty"`
+
+	// DomainApplied is always populated by server 1.5.12+. Tells you which
+	// calibration the API actually used.
+	DomainApplied string `json:"domain_applied,omitempty"`
+	// DomainInference is non-nil only when the caller passed Domain="auto".
+	DomainInference *DomainInference `json:"domain_inference,omitempty"`
 }
 
 // FingerprintResult is the 5-dimensional structural fingerprint.

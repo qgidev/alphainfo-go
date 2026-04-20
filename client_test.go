@@ -233,3 +233,38 @@ func TestContextCancellation(t *testing.T) {
 		t.Fatalf("context cancellation took too long: %v — cancel is not being propagated", elapsed)
 	}
 }
+
+// ── Bloco 1.2 — Close() cleanup ──────────────────────────────────────────
+
+func TestCloseIsIdempotent(t *testing.T) {
+	c, err := NewClient("ai_test_fake")
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+	if err := c.Close(); err != nil {
+		t.Fatalf("first Close: %v", err)
+	}
+	if err := c.Close(); err != nil {
+		t.Fatalf("second Close: %v", err)
+	}
+}
+
+func TestCloseOnNilClient(t *testing.T) {
+	var c *Client
+	if err := c.Close(); err != nil {
+		t.Fatalf("Close on nil: %v", err)
+	}
+}
+
+func TestCloseWithCustomTransport(t *testing.T) {
+	// Provide a custom http.Client so we exercise the CloseIdleConnections
+	// path on the underlying transport.
+	custom := &http.Client{Transport: &http.Transport{}, Timeout: time.Second}
+	c, err := NewClient("ai_test_fake", WithHTTPClient(custom))
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+	if err := c.Close(); err != nil {
+		t.Fatalf("Close: %v", err)
+	}
+}

@@ -2,6 +2,18 @@
 
 All notable changes to alphainfo-go.
 
+## [1.5.11] - 2026-04-20
+
+### Connection cleanup improvements.
+
+- `Client.Close()` added. Drains the underlying `http.Transport`'s
+  idle keep-alive connection pool so short-lived scripts, CLIs and
+  tests can exit without leaving sockets in TIME_WAIT.
+- Idempotent; safe to call from `defer`. Long-lived server processes
+  can ignore it — Go's default pool management is still optimal for
+  those.
+- No API surface break.
+
 ## [1.5.10] - 2026-04-20
 
 ### Initial release — parity with Python SDK 1.5.10.

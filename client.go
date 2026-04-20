@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	sdkVersion     = "1.5.10"
+	sdkVersion     = "1.5.11"
 	defaultBaseURL = "https://www.alphainfo.io"
 	defaultTimeout = 30 * time.Second
 	analyzeTimeout = 120 * time.Second
@@ -75,6 +75,37 @@ func NewClient(apiKey string, opts ...Option) (*Client, error) {
 // zero value (Limit == 0) if nothing has been seen yet.
 func (c *Client) RateLimitInfo() RateLimitInfo {
 	return c.rateLimit
+}
+
+// Close releases idle HTTP connections held by the client's transport.
+//
+// Go's net/http keeps a pool of keep-alive TCP/TLS connections on the
+// transport so subsequent requests reuse them. For long-lived processes
+// this is the right default; for short-lived scripts, CLIs, or tests
+// that exit quickly, calling Close() on shutdown drains the pool so the
+// OS doesn't see dangling sockets in TIME_WAIT longer than necessary.
+//
+// Close is safe to call more than once. It is a no-op if the underlying
+// transport does not implement http.Transport's CloseIdleConnections.
+//
+// Idiomatic usage:
+//
+//	c, err := alphainfo.NewClient(apiKey)
+//	if err != nil { return err }
+//	defer c.Close()
+func (c *Client) Close() error {
+	if c == nil || c.httpClient == nil {
+		return nil
+	}
+	if t, ok := c.httpClient.Transport.(interface{ CloseIdleConnections() }); ok {
+		t.CloseIdleConnections()
+		return nil
+	}
+	// net/http.DefaultTransport satisfies the interface above via the
+	// embedded *http.Transport; when the caller injected a custom
+	// RoundTripper that doesn't, we fall back to the top-level helper.
+	c.httpClient.CloseIdleConnections()
+	return nil
 }
 
 // ---------------------------------------------------------------------------

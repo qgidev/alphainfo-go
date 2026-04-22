@@ -2,6 +2,13 @@
 
 All notable changes to alphainfo-go.
 
+## 1.5.14 — Version parity bump
+
+No code changes in this SDK. Bumped only to keep the version number in
+sync with the Python SDK (which shipped 1.5.14 to fix a stale
+`__version__` string that the other SDKs never had). All functional
+behaviour is identical to 1.5.13.
+
 ## 1.5.13 — Response contract refinement and documentation improvements
 
 Server response shape has been neutralised — the following keys have

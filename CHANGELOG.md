@@ -2,6 +2,18 @@
 
 All notable changes to alphainfo-go.
 
+## 1.5.13 — Response contract refinement and documentation improvements
+
+Server response shape has been neutralised — the following keys have
+new names:
+  • metrics.scale_entropy                            → metrics.complexity_index
+  • metrics.multiscale.curvature                     → metrics.multiscale.scale_profile
+  • metrics.multiscale.summary.scale_curvature_score → metrics.multiscale.summary.profile_score
+
+The 5D fingerprint contract (sim_local/sim_spectral/sim_fractal/
+sim_transition/sim_trend + fingerprint_available + fingerprint_reason)
+is unchanged.
+
 ## [1.5.12] - 2026-04-20
 
 Added automatic domain inference; `Domain` field now optional with

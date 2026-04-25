@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	sdkVersion     = "1.5.21"
+	sdkVersion     = "1.5.22"
 	defaultBaseURL = "https://www.alphainfo.io"
 	defaultTimeout = 30 * time.Second
 	analyzeTimeout = 120 * time.Second
